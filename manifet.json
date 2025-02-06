@@ -1,0 +1,20 @@
+{
+  "name": "Calculadora de Iluminação - A Priori",
+  "short_name": "CalcIluminação",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fefefe",
+  "theme_color": "#a8d5e2",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

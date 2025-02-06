@@ -1,20 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pepino Bros</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Iluminação - A Priori</title>
+  <!-- Favicon usando o emoji 💡 -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💡</text></svg>">
+  <!-- Manifest para PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#a8d5e2">
+  <!-- Fonte delicada -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Fundo com gradiente pastel e fonte personalizada */
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #f6f9fc, #e9eff5);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    header, main {
+      max-width: 600px;
+      margin: auto;
+    }
+    header h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    button {
+      background-color: #a8d5e2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #8cc1d0;
+    }
+    #result, #lampResult {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #eaf4f4;
+      border-radius: 4px;
+    }
+    section {
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="gameArea">
-        <div class="character" id="pepino"></div>
-    </div>
-    <div id="controls">
-        <div class="button" id="left">←</div>
-        <div class="button" id="jump">⯅</div>
-        <div class="button" id="right">→</div>
-    </div>
-    <script src="script.js"></script>
+  <header>
+    <h1>Calculadora de Iluminação - A Priori</h1>
+  </header>
+  <main>
+    <!-- Seção 1: Cálculo de Lúmens Necessários -->
+    <section id="illuminationCalculator">
+      <form id="calcForm">
+        <!-- Área em m² -->
+        <div class="form-group">
+           <label for="area">Área a ser iluminada (m²):</label>
+           <input type="number" id="area" name="area" step="0.01" placeholder="Ex.: 15.5" required>
+        </div>
+        <!-- Seleção do tipo de ambiente -->
+        <div class="form-group">
+           <p>Tipo de ambiente:</p>
+           <label><input type="radio" name="tipo" value="comercial" checked> Comercial</label>
+           <label><input type="radio" name="tipo" value="residencial"> Residencial</label>
+        </div>
+        <!-- Dropdown para selecionar o ambiente específico -->
+        <div class="form-group" id="dropdownContainer">
+           <label for="ambiente">Selecione o ambiente:</label>
+           <select id="ambiente" name="ambiente">
+             <!-- Opções serão adicionadas via JavaScript -->
+           </select>
+        </div>
+        <!-- Seleção da cor do piso -->
+        <div class="form-group">
+           <p>Cor do piso:</p>
+           <label><input type="radio" name="piso" value="claro" checked> Claro</label>
+           <label><input type="radio" name="piso" value="medio"> Médio</label>
+           <label><input type="radio" name="piso" value="escuro"> Escuro</label>
+        </div>
+        <!-- Seleção da temperatura de cor – sugestões automáticas -->
+        <div class="form-group">
+           <p>Temperatura de Cor (K) sugerida:</p>
+           <label><input type="checkbox" name="temp" value="2700"> 2700K</label>
+           <label><input type="checkbox" name="temp" value="3000"> 3000K</label>
+           <label><input type="checkbox" name="temp" value="4000"> 4000K</label>
+           <label><input type="checkbox" name="temp" value="6000"> 6000K</label>
+        </div>
+        <button type="submit">Calcular Iluminação Necessária</button>
+      </form>
+      <div id="result"></div>
+    </section>
+
+    <!-- Seção 2: Cálculo de Quantidade de Luminárias -->
+    <section id="lampCalculator">
+      <h2>Calculadora de Quantidade de Luminárias</h2>
+      <form id="lampForm">
+        <!-- Sugestões de Luminárias -->
+        <div class="form-group">
+          <p>Selecione o tipo de luminária:</p>
+          <label><input type="radio" name="lampType" value="painelLED" checked> Painel LED</label>
+          <label><input type="radio" name="lampType" value="spotAR70"> Spot AR70</label>
+          <label><input type="radio" name="lampType" value="spotAR111"> Spot AR111</label>
+          <label><input type="radio" name="lampType" value="par20"> Par20</label>
+          <label><input type="radio" name="lampType" value="par30"> Par30</label>
+          <label><input type="radio" name="lampType" value="bulboLED"> Bulbo LED</label>
+          <label><input type="radio" name="lampType" value="bulboFilamento"> Bulbo Filamento</label>
+          <label><input type="radio" name="lampType" value="calhaFitaLED"> Calha com Fita LED</label>
+          <label><input type="radio" name="lampType" value="downlightLED"> Downlight LED</label>
+          <label><input type="radio" name="lampType" value="fluorescente"> Luminária Fluorescente</label>
+        </div>
+        <!-- Inserção da potência da luminária em lúmens -->
+        <div class="form-group">
+          <label for="lampLumens">Insira a potência em lúmens da luminária:</label>
+          <input type="number" id="lampLumens" name="lampLumens" step="1" placeholder="Ex.: 3400" required>
+        </div>
+        <button type="submit">Calcular Quantidade de Luminárias</button>
+      </form>
+      <div id="lampResult"></div>
+    </section>
+  </main>
+
+  <script>
+    // Mapeamentos de ambientes com valores de iluminância (lux) e recomendações de temperatura
+    const comercialAmbientes = {
+      "produtos": { label: "Área de Produtos", lux: 500, temps: ["4000K", "6000K"] },
+      "servico": { label: "Área de Serviço / Atendimento", lux: 400, temps: ["3000K", "4000K"] },
+      "mesas": { label: "Área de Mesas", lux: 300, temps: ["2700K", "3000K"] },
+      "producao": { label: "Área de Produção", lux: 500, temps: ["4000K", "6000K"] },
+      "industria": { label: "Indústria", lux: 750, temps: ["6000K"] },
+      "escritorio": { label: "Escritório", lux: 300, temps: ["3000K", "4000K"] }
+    };
+
+    const residencialAmbientes = {
+      "hall": { label: "Hall", lux: 200, temps: ["2700K"] },
+      "garagem": { label: "Garagem", lux: 150, temps: ["3000K"] },
+      "sala": { label: "Sala de Estar", lux: 150, temps: ["2700K"] },
+      "cozinha": { label: "Cozinha", lux: 300, temps: ["3000K", "4000K"] },
+      "banheiro": { label: "Banheiro", lux: 300, temps: ["3000K"] },
+      "corredor": { label: "Corredor", lux: 150, temps: ["2700K"] },
+      "quarto": { label: "Quarto", lux: 150, temps: ["2700K"] },
+      "suite": { label: "Suíte", lux: 150, temps: ["2700K"] },
+      "escritorio": { label: "Escritório", lux: 300, temps: ["3000K"] }
+    };
+
+    // Fator de ajuste conforme cor do piso
+    const floorFactor = {
+      "claro": 0.9,
+      "medio": 1.0,
+      "escuro": 1.1
+    };
+
+    // Variável global para armazenar o total de lúmens calculados na Seção 1
+    let globalLumens = 0;
+
+    // Popula o dropdown de ambientes conforme o tipo selecionado
+    function populateAmbientes() {
+      const tipo = document.querySelector('input[name="tipo"]:checked').value;
+      const select = document.getElementById("ambiente");
+      select.innerHTML = ""; // limpa as opções
+
+      let ambientes = tipo === "comercial" ? comercialAmbientes : residencialAmbientes;
+      for (let key in ambientes) {
+        let option = document.createElement("option");
+        option.value = key;
+        option.textContent = ambientes[key].label;
+        select.appendChild(option);
+      }
+      updateTemperatureCheckboxes();
+    }
+
+    // Atualiza os checkboxes de temperatura de cor de acordo com o ambiente selecionado
+    function updateTemperatureCheckboxes() {
+      const tipo = document.querySelector('input[name="tipo"]:checked').value;
+      const select = document.getElementById("ambiente");
+      const ambienteKey = select.value;
+      let ambientes = tipo === "comercial" ? comercialAmbientes : residencialAmbientes;
+      const recomendados = ambientes[ambienteKey].temps;
+
+      document.querySelectorAll('input[name="temp"]').forEach(cb => {
+        cb.checked = recomendados.includes(cb.value + "K");
+      });
+    }
+
+    // Eventos para atualizar o dropdown e os checkboxes conforme a seleção do tipo
+    document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+      radio.addEventListener("change", populateAmbientes);
+    });
+    document.getElementById("ambiente").addEventListener("change", updateTemperatureCheckboxes);
+    window.addEventListener("load", populateAmbientes);
+
+    // Cálculo da iluminação necessária na Seção 1
+    document.getElementById("calcForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const area = parseFloat(document.getElementById("area").value);
+      const tipo = document.querySelector('input[name="tipo"]:checked').value;
+      const ambienteKey = document.getElementById("ambiente").value;
+      const piso = document.querySelector('input[name="piso"]:checked').value;
+      let ambientes = tipo === "comercial" ? comercialAmbientes : residencialAmbientes;
+
+      const luxRecomendado = ambientes[ambienteKey].lux;
+      const tempRecomendados = ambientes[ambienteKey].temps.join(", ");
+      const fatorPiso = floorFactor[piso];
+
+      // Cálculo dos lúmens necessários
+      const lumensNecessarios = area * luxRecomendado * fatorPiso;
+      globalLumens = lumensNecessarios; // Armazena para uso na Seção 2
+
+      document.getElementById("result").innerHTML = `
+        <h2>Resultado</h2>
+        <p><strong>Ambiente:</strong> ${ambientes[ambienteKey].label}</p>
+        <p><strong>Área:</strong> ${area.toFixed(2)} m²</p>
+        <p><strong>Iluminância recomendada:</strong> ${luxRecomendado} lux</p>
+        <p><strong>Fator do piso (${piso}):</strong> ${fatorPiso}</p>
+        <p><strong>Total de lúmens necessários:</strong> ${Math.round(lumensNecessarios)} lm</p>
+        <p><strong>Temperatura(s) de cor ideal(is):</strong> ${tempRecomendados}</p>
+      `;
+    });
+
+    // Cálculo da quantidade de luminárias na Seção 2
+    document.getElementById("lampForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      if (!globalLumens || globalLumens === 0) {
+        alert("Por favor, calcule a iluminação necessária na primeira seção antes de determinar a quantidade de luminárias.");
+        return;
+      }
+      const lampLumens = parseFloat(document.getElementById("lampLumens").value);
+      if (lampLumens <= 0) {
+        alert("Insira um valor válido de lúmens para a luminária.");
+        return;
+      }
+      // Calcula a quantidade de luminárias necessárias (arredondando para cima)
+      const qtdLampadas = Math.ceil(globalLumens / lampLumens);
+
+      document.getElementById("lampResult").innerHTML = `
+        <h3>Resultado</h3>
+        <p>Total de lúmens necessários: <strong>${Math.round(globalLumens)} lm</strong></p>
+        <p>Com luminárias de <strong>${lampLumens} lm</strong>, serão necessárias <strong>${qtdLampadas}</strong> unidades.</p>
+      `;
+    });
+
+    // Registro do Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(function(registration) {
+        console.log('Service Worker registrado com sucesso: ', registration.scope);
+      }).catch(function(error) {
+        console.log('Falha ao registrar Service Worker: ', error);
+      });
+    }
+  </script>
 </body>
 </html>
