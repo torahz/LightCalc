@@ -1,7 +1,7 @@
 {
   "name": "Calculadora de Iluminação - A Priori",
   "short_name": "CalcIluminação",
-  "start_url": "./index.html",
+  "start_url": "https://torahz.github.io/LightCalc/",
   "display": "standalone",
   "background_color": "#fefefe",
   "theme_color": "#a8d5e2",
