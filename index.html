@@ -73,6 +73,12 @@
       padding-bottom: 20px;
       border-bottom: 1px solid #ccc;
     }
+    /* Botão de instalação (inicialmente oculto) */
+    #installBtn {
+      display: none;
+      background-color: #5A6D50;
+      margin-top: 20px;
+    }
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -90,36 +96,36 @@
       <form id="calcForm">
         <!-- Área em m² -->
         <div class="form-group">
-           <label for="area">Área a ser iluminada (m²):</label>
-           <input type="number" id="area" name="area" step="0.01" placeholder="Ex.: 15.5" required>
+          <label for="area">Área a ser iluminada (m²):</label>
+          <input type="number" id="area" name="area" step="0.01" placeholder="Ex.: 15.5" required>
         </div>
         <!-- Seleção do tipo de ambiente -->
         <div class="form-group">
-           <p>Tipo de ambiente:</p>
-           <label><input type="radio" name="tipo" value="comercial" checked> Comercial</label>
-           <label><input type="radio" name="tipo" value="residencial"> Residencial</label>
+          <p>Tipo de ambiente:</p>
+          <label><input type="radio" name="tipo" value="comercial" checked> Comercial</label>
+          <label><input type="radio" name="tipo" value="residencial"> Residencial</label>
         </div>
         <!-- Dropdown para selecionar o ambiente específico -->
         <div class="form-group" id="dropdownContainer">
-           <label for="ambiente">Selecione o ambiente:</label>
-           <select id="ambiente" name="ambiente">
-             <!-- Opções serão adicionadas via JavaScript -->
-           </select>
+          <label for="ambiente">Selecione o ambiente:</label>
+          <select id="ambiente" name="ambiente">
+            <!-- Opções serão adicionadas via JavaScript -->
+          </select>
         </div>
         <!-- Seleção da cor do piso -->
         <div class="form-group">
-           <p>Cor do piso:</p>
-           <label><input type="radio" name="piso" value="claro" checked> Claro</label>
-           <label><input type="radio" name="piso" value="medio"> Médio</label>
-           <label><input type="radio" name="piso" value="escuro"> Escuro</label>
+          <p>Cor do piso:</p>
+          <label><input type="radio" name="piso" value="claro" checked> Claro</label>
+          <label><input type="radio" name="piso" value="medio"> Médio</label>
+          <label><input type="radio" name="piso" value="escuro"> Escuro</label>
         </div>
         <!-- Seleção da temperatura de cor – sugestões automáticas -->
         <div class="form-group">
-           <p>Temperatura de Cor (K) sugerida:</p>
-           <label><input type="checkbox" name="temp" value="2700"> 2700K</label>
-           <label><input type="checkbox" name="temp" value="3000"> 3000K</label>
-           <label><input type="checkbox" name="temp" value="4000"> 4000K</label>
-           <label><input type="checkbox" name="temp" value="6000"> 6000K</label>
+          <p>Temperatura de Cor (K) sugerida:</p>
+          <label><input type="checkbox" name="temp" value="2700"> 2700K</label>
+          <label><input type="checkbox" name="temp" value="3000"> 3000K</label>
+          <label><input type="checkbox" name="temp" value="4000"> 4000K</label>
+          <label><input type="checkbox" name="temp" value="6000"> 6000K</label>
         </div>
         <button type="submit">Calcular Iluminação Necessária</button>
       </form>
@@ -153,6 +159,10 @@
       </form>
       <div id="lampResult"></div>
     </section>
+    
+    <!-- Botão para instalação do app -->
+    <button id="installBtn">Instalar App</button>
+    
   </main>
 
   <script>
@@ -211,7 +221,6 @@
       const ambienteKey = select.value;
       let ambientes = tipo === "comercial" ? comercialAmbientes : residencialAmbientes;
       const recomendados = ambientes[ambienteKey].temps;
-
       document.querySelectorAll('input[name="temp"]').forEach(cb => {
         cb.checked = recomendados.includes(cb.value + "K");
       });
@@ -266,7 +275,6 @@
       }
       // Calcula a quantidade de luminárias necessárias (arredondando para cima)
       const qtdLampadas = Math.ceil(globalLumens / lampLumens);
-
       document.getElementById("lampResult").innerHTML = `
         <h3>Resultado</h3>
         <p>Total de lúmens necessários: <strong>${Math.round(globalLumens)} lm</strong></p>
@@ -282,6 +290,30 @@
         console.log('Falha ao registrar Service Worker: ', error);
       });
     }
+
+    /* Lógica para exibir o prompt de instalação */
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Impede que o prompt seja exibido automaticamente
+      e.preventDefault();
+      deferredPrompt = e;
+      // Exibe o botão de instalação
+      installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      deferredPrompt.prompt(); // Exibe o prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('Usuário aceitou a instalação');
+      } else {
+        console.log('Usuário rejeitou a instalação');
+      }
+      deferredPrompt = null;
+    });
   </script>
 </body>
 </html>
